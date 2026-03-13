@@ -11,7 +11,7 @@ class Account {
   }
 
   viewBalance() {
-    return `Current balance: ${this.balance.toFixed(2).padStart(8, '0')}`;
+    return `Current balance: ${this.balance.toFixed(2).padStart(9, '0')}`;
   }
 
   credit(amount) {
@@ -20,7 +20,7 @@ class Account {
       return 'Invalid amount.';
     }
     this.balance += amt;
-    return `Amount credited. New balance: ${this.balance.toFixed(2).padStart(8, '0')}`;
+    return `Amount credited. New balance: ${this.balance.toFixed(2).padStart(9, '0')}`;
   }
 
   debit(amount) {
@@ -30,7 +30,7 @@ class Account {
     }
     if (this.balance >= amt) {
       this.balance -= amt;
-      return `Amount debited. New balance: ${this.balance.toFixed(2).padStart(8, '0')}`;
+      return `Amount debited. New balance: ${this.balance.toFixed(2).padStart(9, '0')}`;
     } else {
       return 'Insufficient funds for this debit.';
     }
