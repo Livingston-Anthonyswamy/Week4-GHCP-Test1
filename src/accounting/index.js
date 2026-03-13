@@ -5,7 +5,37 @@ const rl = readline.createInterface({
   output: process.stdout
 });
 
-let balance = 1000.00;
+class Account {
+  constructor(initialBalance = 1000.00) {
+    this.balance = initialBalance;
+  }
+
+  viewBalance() {
+    return `Current balance: ${this.balance.toFixed(2).padStart(8, '0')}`;
+  }
+
+  credit(amount) {
+    const amt = parseFloat(amount);
+    if (isNaN(amt) || amt <= 0) {
+      return 'Invalid amount.';
+    }
+    this.balance += amt;
+    return `Amount credited. New balance: ${this.balance.toFixed(2).padStart(8, '0')}`;
+  }
+
+  debit(amount) {
+    const amt = parseFloat(amount);
+    if (isNaN(amt) || amt <= 0) {
+      return 'Invalid amount.';
+    }
+    if (this.balance >= amt) {
+      this.balance -= amt;
+      return `Amount debited. New balance: ${this.balance.toFixed(2).padStart(8, '0')}`;
+    } else {
+      return 'Insufficient funds for this debit.';
+    }
+  }
+}
 
 function displayMenu() {
   console.log('--------------------------------');
@@ -17,47 +47,8 @@ function displayMenu() {
   console.log('--------------------------------');
 }
 
-function viewBalance() {
-  console.log(`Current balance: ${balance.toFixed(2).padStart(8, '0')}`);
-}
-
-function creditAccount() {
-  return new Promise((resolve) => {
-    rl.question('Enter credit amount: ', (amount) => {
-      const amt = parseFloat(amount);
-      if (isNaN(amt) || amt <= 0) {
-        console.log('Invalid amount.');
-        resolve();
-        return;
-      }
-      balance += amt;
-      console.log(`Amount credited. New balance: ${balance.toFixed(2).padStart(8, '0')}`);
-      resolve();
-    });
-  });
-}
-
-function debitAccount() {
-  return new Promise((resolve) => {
-    rl.question('Enter debit amount: ', (amount) => {
-      const amt = parseFloat(amount);
-      if (isNaN(amt) || amt <= 0) {
-        console.log('Invalid amount.');
-        resolve();
-        return;
-      }
-      if (balance >= amt) {
-        balance -= amt;
-        console.log(`Amount debited. New balance: ${balance.toFixed(2).padStart(8, '0')}`);
-      } else {
-        console.log('Insufficient funds for this debit.');
-      }
-      resolve();
-    });
-  });
-}
-
 async function main() {
+  const account = new Account();
   let continueFlag = true;
   while (continueFlag) {
     displayMenu();
@@ -67,13 +58,19 @@ async function main() {
     const userChoice = parseInt(choice);
     switch (userChoice) {
       case 1:
-        viewBalance();
+        console.log(account.viewBalance());
         break;
       case 2:
-        await creditAccount();
+        const creditAmount = await new Promise((resolve) => {
+          rl.question('Enter credit amount: ', resolve);
+        });
+        console.log(account.credit(creditAmount));
         break;
       case 3:
-        await debitAccount();
+        const debitAmount = await new Promise((resolve) => {
+          rl.question('Enter debit amount: ', resolve);
+        });
+        console.log(account.debit(debitAmount));
         break;
       case 4:
         continueFlag = false;
@@ -86,4 +83,8 @@ async function main() {
   rl.close();
 }
 
-main();
+if (require.main === module) {
+  main();
+}
+
+module.exports = { Account };
